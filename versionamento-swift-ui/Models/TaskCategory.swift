@@ -7,7 +7,9 @@
 
 import Foundation
 
-enum TaskCategory: String {
+enum TaskCategory: String, Identifiable {
+    var id: String { rawValue }
+    
     case education = "Education"
     case fitness = "Fitness"
     case groceries = "Groceries"

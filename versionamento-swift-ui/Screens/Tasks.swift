@@ -10,23 +10,48 @@ import SwiftUI
 struct Tasks: View {
     
     var tasks: [Task] = [
-        Task(name: "Almoço", details: "no RU", category: .fitness, isCompleted: false),
-        Task(name: "Janta", details: "no RU", category: .fitness, isCompleted: false),
-        Task(name: "Lanche", details: "no RU", category: .fitness, isCompleted: false),
-        Task(name: "Café da Manhã", details: "no RU", category: .fitness, isCompleted: false)
+        Task(name: "fitness", details: "no RU", category: .fitness, isCompleted: false),
+        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
+        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
+        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
+        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
+        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
+        Task(name: "fitness", details: "no RU", category: .fitness, isCompleted: false),
+        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
+        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false)
     ]
+    
+    var groupedTasks: [TaskCategory: [Task]] {
+        Dictionary(grouping: tasks, by: { $0.category })
+    }
+    
+    var sortedCategories: [TaskCategory] {
+        groupedTasks.keys.sorted(by: { $0.rawValue < $1.rawValue })
+    }
     
     var body: some View {
         
         if tasks.isEmpty {
             EmptyStateView()
         } else {
-            List (tasks) { task in
+            
+            List (sortedCategories) { category in
                 
-                TaskView(task: task)
+                HeaderView(taskCategory: category)
                     .listRowInsets(EdgeInsets())
+                    .padding(.top, 20)
                 
+                if let categoryTasks = groupedTasks[category] {
+                    
+                    ForEach(categoryTasks) { task in
+                        TaskView(task: task)
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(task.id == categoryTasks.last?.id ? .hidden : .visible, edges: .bottom)
+                        
+                    }
+                }
             }
+            .listStyle(.plain)
         }
     }
 }
