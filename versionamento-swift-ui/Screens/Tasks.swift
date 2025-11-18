@@ -22,7 +22,10 @@ struct Tasks: View {
             EmptyStateView()
         } else {
             List (tasks) { task in
-                Text(task.name)
+                
+                TaskView(task: task)
+                    .listRowInsets(EdgeInsets())
+                
             }
         }
     }
