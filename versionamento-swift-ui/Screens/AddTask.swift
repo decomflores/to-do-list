@@ -12,7 +12,9 @@ struct AddTask: View {
     @Environment(\.dismiss) var dismiss
     
     @State var name: String = ""
+    @State var category: TaskCategory?
     @State var details: String = ""
+    @State var missingInfos: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -34,7 +36,45 @@ struct AddTask: View {
                             )
                     }
                     
-//                    input categoria
+                    HStack(spacing: 12) {
+                        Image(systemName: category?.imageName ?? "list.bullet")
+                            .foregroundStyle(.white)
+                            .frame(width: 30, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 7)
+                                    .foregroundStyle(.accent)
+                            )
+                        
+                        Text("Category")
+                            .padding(.vertical, 11)
+                        //Segunda opção .frame(maxWidth: .infinity, alignment: .leading)
+                        Spacer()
+                        
+                        Menu {
+                            
+                            ForEach(TaskCategory.allCases) { category in
+                                
+                                Button(category.rawValue, systemImage: category.imageName) {
+                                    self.category = category
+                                }
+                                
+                            }
+                            
+                        } label: {
+                            HStack {
+                                Text(category?.rawValue ?? "Select")
+                                
+                                Image(systemName: "chevron.up.chevron.down")
+                            }
+                        }
+                        
+                        
+                    }
+                    .padding(.horizontal)
+                    .background(
+                        RoundedRectangle(cornerRadius: 26)
+                            .foregroundStyle(.backgroundTertiary)
+                    )
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Details")
@@ -59,6 +99,9 @@ struct AddTask: View {
             .background(.backgroundSecondary)
             .navigationTitle(Text("Add Task"))
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Missing Infos", isPresented: $missingInfos, actions: {
+                Button("Ok", role: .cancel) {}
+            })
             .toolbar {
                 
                 
@@ -70,7 +113,12 @@ struct AddTask: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "paperplane") {
-                        //                            to do
+                        
+                        if let category, !name.isEmpty, !details.isEmpty {
+                            //Enviar
+                        } else {
+                            missingInfos = true
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                 }
