@@ -21,6 +21,8 @@ struct Tasks: View {
         Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false)
     ]
     
+    @State var addTask: Bool = false
+    
     var groupedTasks: [TaskCategory: [Binding<Task>]] {
         Dictionary(grouping: $tasks, by: { $0.category.wrappedValue })
     }
@@ -31,27 +33,48 @@ struct Tasks: View {
     
     var body: some View {
         
-        if tasks.isEmpty {
-            EmptyStateView()
-        } else {
+        NavigationStack {
             
-            List (sortedCategories) { category in
-                
-                HeaderView(taskCategory: category)
-                    .listRowInsets(EdgeInsets())
-                    .padding(.top, 20)
-                
-                if let categoryTasks = groupedTasks[category] {
+            VStack {
+                if tasks.isEmpty {
+                    EmptyStateView(addTask: $addTask)
+                } else {
                     
-                    ForEach(categoryTasks) { task in
-                        TaskView(task: task)
-                            .listRowInsets(EdgeInsets())
-                            .listRowSeparator(task.id == categoryTasks.last?.id ? .hidden : .visible, edges: .bottom)
+                    List (sortedCategories) { category in
                         
+                        HeaderView(taskCategory: category)
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(.hidden, edges: .top)
+                            .padding(.top, 20)
+                        
+                        if let categoryTasks = groupedTasks[category] {
+                            
+                            ForEach(categoryTasks) { task in
+                                TaskView(task: task)
+                                    .listRowInsets(EdgeInsets())
+                                    .listRowSeparator(task.id == categoryTasks.last?.id ? .hidden : .visible, edges: .bottom)
+                                
+                            }
+                        }
                     }
+                    .listStyle(.plain)
                 }
             }
-            .listStyle(.plain)
+            
+            .sheet(isPresented: $addTask, content: {
+                AddTask()
+                    .presentationDragIndicator(.visible)
+            })
+            
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add", systemImage: "plus") {
+                        addTask = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+
         }
     }
 }
