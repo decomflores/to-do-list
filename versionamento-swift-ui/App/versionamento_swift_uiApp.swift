@@ -13,7 +13,7 @@ import SwiftData
 struct versionamento_swift_uiApp: App {
     var body: some Scene {
         WindowGroup {
-            Tasks()
+            TabBar()
         }
         .modelContainer(for: Task.self)
     }
