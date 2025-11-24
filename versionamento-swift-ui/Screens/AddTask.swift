@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddTask: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
     
     @State var name: String = ""
     @State var category: TaskCategory?
@@ -115,7 +117,13 @@ struct AddTask: View {
                     Button("Add", systemImage: "paperplane") {
                         
                         if let category, !name.isEmpty, !details.isEmpty {
-                            //Enviar
+                            let newTask = Task(name: name, details: details, category: category, isCompleted: false)
+                            
+                            modelContext.insert(newTask)
+                            try? modelContext.save()
+                            
+                            dismiss()
+                            
                         } else {
                             missingInfos = true
                         }

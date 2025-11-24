@@ -6,25 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct Tasks: View {
     
-    @State var tasks: [Task] = [
-        Task(name: "fitness", details: "no RU", category: .fitness, isCompleted: false),
-        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
-        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
-        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
-        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false),
-        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
-        Task(name: "fitness", details: "no RU", category: .fitness, isCompleted: false),
-        Task(name: "education", details: "no RU", category: .education, isCompleted: false),
-        Task(name: "groceries", details: "no RU", category: .groceries, isCompleted: false)
-    ]
+    @Environment(\.modelContext) var modelContext
+    @Query var tasks: [Task]
     
     @State var addTask: Bool = false
     
-    var groupedTasks: [TaskCategory: [Binding<Task>]] {
-        Dictionary(grouping: $tasks, by: { $0.category.wrappedValue })
+    var groupedTasks: [TaskCategory: [Task]] {
+        Dictionary(grouping: tasks, by: { $0.category })
     }
     
     var sortedCategories: [TaskCategory] {
@@ -53,7 +45,12 @@ struct Tasks: View {
                                 TaskView(task: task)
                                     .listRowInsets(EdgeInsets())
                                     .listRowSeparator(task.id == categoryTasks.last?.id ? .hidden : .visible, edges: .bottom)
-                                
+                                    .swipeActions(edge: .trailing) {
+                                        Button("", systemImage: "trash", role: .destructive) {
+                                            modelContext.delete(task)
+                                            try? modelContext.save()
+                                        }
+                                    }
                             }
                         }
                     }
