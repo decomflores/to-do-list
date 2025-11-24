@@ -14,6 +14,7 @@ struct Tasks: View {
     @Query var tasks: [Task]
     
     @State var addTask: Bool = false
+    @State var editTask: Task? = nil
     
     var groupedTasks: [TaskCategory: [Task]] {
         Dictionary(grouping: tasks, by: { $0.category })
@@ -24,8 +25,6 @@ struct Tasks: View {
     }
     
     var body: some View {
-        
-        NavigationStack {
             
             VStack {
                 if tasks.isEmpty {
@@ -42,7 +41,11 @@ struct Tasks: View {
                         if let categoryTasks = groupedTasks[category] {
                             
                             ForEach(categoryTasks) { task in
-                                TaskView(task: task)
+                                Button {
+                                    editTask = task
+                                } label: {
+                                    TaskView(task: task)
+                                }
                                     .listRowInsets(EdgeInsets())
                                     .listRowSeparator(task.id == categoryTasks.last?.id ? .hidden : .visible, edges: .bottom)
                                     .swipeActions(edge: .trailing) {
@@ -57,12 +60,14 @@ struct Tasks: View {
                     .listStyle(.plain)
                 }
             }
-            
             .sheet(isPresented: $addTask, content: {
-                AddTask()
+                UpInsertTask()
                     .presentationDragIndicator(.visible)
             })
-            
+            .sheet(item: $editTask, content: { task in
+                UpInsertTask(task: task)
+                    .presentationDragIndicator(.visible)
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {
@@ -71,12 +76,11 @@ struct Tasks: View {
                     .buttonStyle(.borderedProminent)
                 }
             }
-
-        }
+            .navigationTitle("Tasks")
     }
 }
 
 
 #Preview {
-    Tasks()
+    TabBar()
 }
