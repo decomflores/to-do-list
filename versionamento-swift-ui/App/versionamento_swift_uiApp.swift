@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import SwiftData
+
 
 @main
 struct versionamento_swift_uiApp: App {
@@ -13,5 +15,6 @@ struct versionamento_swift_uiApp: App {
         WindowGroup {
             Tasks()
         }
+        .modelContainer(for: Task.self)
     }
 }
